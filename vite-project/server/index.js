@@ -33,6 +33,7 @@ if (fs.existsSync(distDir)) {
 
 const { Pool } = pg;
 const databaseUrl = process.env.DATABASE_URL;
+const paystackSecretKey = process.env.PAYSTACK_SECRET_KEY;
 if (!databaseUrl) {
   console.error("DATABASE_URL is not set.");
   process.exit(1);
@@ -64,6 +65,53 @@ const initDb = async () => {
       musicPath TEXT
     );
   `);
+};
+
+const verifyPaystackPayment = async (
+  reference,
+  expectedAmount,
+  expectedCurrency,
+) => {
+  if (!paystackSecretKey) {
+    return {
+      ok: false,
+      message: "Paystack secret key is not configured.",
+    };
+  }
+
+  const response = await fetch(
+    `https://api.paystack.co/transaction/verify/${encodeURIComponent(reference)}`,
+    {
+      headers: {
+        Authorization: `Bearer ${paystackSecretKey}`,
+      },
+    },
+  );
+
+  const result = await response.json().catch(() => ({}));
+  if (!response.ok || !result?.status) {
+    return {
+      ok: false,
+      message: result?.message || "Payment verification failed.",
+    };
+  }
+
+  const data = result.data || {};
+  if (data.status !== "success") {
+    return { ok: false, message: "Payment not successful." };
+  }
+
+  if (Number.isFinite(expectedAmount) && expectedAmount > 0) {
+    if (data.amount !== expectedAmount) {
+      return { ok: false, message: "Payment amount mismatch." };
+    }
+  }
+
+  if (expectedCurrency && data.currency && data.currency !== expectedCurrency) {
+    return { ok: false, message: "Payment currency mismatch." };
+  }
+
+  return { ok: true, data };
 };
 
 const storage = multer.diskStorage({
@@ -292,6 +340,19 @@ app.post(
   ]),
   async (req, res) => {
     try {
+      const expectedAmount = Math.round(
+        Number(req.body.packagePrice || 0) * 100,
+      );
+      const verifyResult = await verifyPaystackPayment(
+        req.body.paymentReference,
+        expectedAmount,
+        "GHS",
+      );
+      if (!verifyResult.ok) {
+        res.status(402).json({ message: verifyResult.message });
+        return;
+      }
+
       const slug = `${Date.now().toString(36)}${Math.random()
         .toString(36)
         .slice(2, 8)}`;
