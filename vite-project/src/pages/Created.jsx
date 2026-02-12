@@ -8,7 +8,7 @@ import galleryThree from "@/assets/d2.jpg";
 import galleryFour from "@/assets/d3.jpg";
 import galleryFive from "@/assets/l2.jpg";
 
-const PAYSTACK_PUBLIC_KEY = import.meta.env.VITE_PAYSTACK_PUBLIC_KEY || "";
+const PAYSTACK_PUBLIC_KEY = "pk_test_82e1bad2bde76775cd84cee6bab846d72433b0a3";
 
 const backgroundPlaylist = [
   "/music/love.mp3",
@@ -62,8 +62,6 @@ const initialFormState = {
   firstEncounter: "",
   loveMessage: "",
   whatsapp: "",
-  paymentPhone: "",
-  paymentProvider: "mtn",
   surpriseTime: "",
   email: "",
   pageColor: "#f43f5e",
@@ -264,12 +262,6 @@ const Created = () => {
       return;
     }
 
-    const paymentDigits = formData.paymentPhone.replace(/[^0-9]/g, "");
-    if (formData.paymentPhone.trim() && paymentDigits.length < 9) {
-      setSubmitError("Please enter a valid mobile money number.");
-      return;
-    }
-
     setIsSubmitting(true);
 
     try {
@@ -320,11 +312,6 @@ const Created = () => {
               value: formData.senderName,
             },
             {
-              display_name: "Payment Phone",
-              variable_name: "payment_phone",
-              value: formData.paymentPhone,
-            },
-            {
               display_name: "Partner Name",
               variable_name: "partner_name",
               value: formData.partnerName,
@@ -336,15 +323,6 @@ const Created = () => {
             },
           ],
         },
-        channels: ["card", "mobile_money"],
-        ...(paymentDigits
-          ? {
-              mobile_money: {
-                phone: paymentDigits,
-                provider: formData.paymentProvider || "mtn",
-              },
-            }
-          : {}),
         callback: (response) => {
           handlePaymentSuccess(response);
         },
@@ -613,39 +591,6 @@ const Created = () => {
                 placeholder="you@example.com"
                 className="w-full rounded-xl border border-red-100 bg-white px-4 py-3 text-gray-800 shadow-sm focus:border-red-300 focus:outline-none focus:ring-2 focus:ring-red-100"
               />
-            </div>
-
-            <div className="grid gap-2">
-              <label className="text-sm font-semibold text-gray-700">
-                Mobile money number (for payment)
-              </label>
-              <input
-                type="tel"
-                name="paymentPhone"
-                value={formData.paymentPhone}
-                onChange={handleChange}
-                placeholder="e.g., 024 000 0000"
-                className="w-full rounded-xl border border-red-100 bg-white px-4 py-3 text-gray-800 shadow-sm focus:border-red-300 focus:outline-none focus:ring-2 focus:ring-red-100"
-              />
-              <p className="text-xs text-gray-500">
-                Use the payer's MoMo number if paying with mobile money.
-              </p>
-            </div>
-
-            <div className="grid gap-2">
-              <label className="text-sm font-semibold text-gray-700">
-                Mobile money network
-              </label>
-              <select
-                name="paymentProvider"
-                value={formData.paymentProvider}
-                onChange={handleChange}
-                className="w-full rounded-xl border border-red-100 bg-white px-4 py-3 text-gray-800 shadow-sm focus:border-red-300 focus:outline-none focus:ring-2 focus:ring-red-100"
-              >
-                <option value="mtn">MTN</option>
-                <option value="vod">Vodafone</option>
-                <option value="tgo">AirtelTigo</option>
-              </select>
             </div>
 
             {selectedPackage?.includesPhotos && (

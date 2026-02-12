@@ -269,7 +269,6 @@ const Hero = () => {
             initial={{ opacity: 0 }}
             animate={{ opacity: 1 }}
             exit={{ opacity: 0 }}
-            onClick={() => setIsExampleOpen(false)}
           >
             <motion.div
               className="relative w-full max-w-3xl max-h-[85vh] overflow-hidden rounded-3xl bg-white shadow-2xl"
@@ -277,16 +276,15 @@ const Hero = () => {
               animate={{ opacity: 1, scale: 1, y: 0 }}
               exit={{ opacity: 0, scale: 0.96, y: 20 }}
               transition={{ duration: 0.3 }}
-              onClick={(event) => event.stopPropagation()}
             >
               <button
                 type="button"
-                className="absolute right-3 top-3 z-20 rounded-full bg-white/95 px-3 py-1 text-xs font-semibold text-gray-700 shadow-lg sm:right-4 sm:top-4"
+                className="absolute right-4 top-4 rounded-full bg-white/90 px-3 py-1 text-xs font-semibold text-gray-700 shadow"
                 onClick={() => setIsExampleOpen(false)}
               >
                 Close
               </button>
-              <div className="grid lg:grid-cols-[1.1fr_0.9fr] max-h-[85vh] overflow-y-auto pt-10 sm:pt-0">
+              <div className="grid lg:grid-cols-[1.1fr_0.9fr] max-h-[85vh] overflow-y-auto">
                 <div className="relative min-h-[220px]">
                   <img
                     src={previewMain}

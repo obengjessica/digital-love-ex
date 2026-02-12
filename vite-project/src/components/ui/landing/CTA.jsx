@@ -40,11 +40,9 @@ const CTA = () => {
           <Button
             asChild
             size="lg"
-            className="bg-white text-rose-600 hover:bg-rose-50 px-6 sm:px-10 py-6 text-lg rounded-full shadow-xl hover:shadow-2xl transition-all duration-300 font-semibold w-full sm:w-auto whitespace-normal text-center"
+            className="bg-white text-rose-600 hover:bg-rose-50 px-10 py-6 text-lg rounded-full shadow-xl hover:shadow-2xl transition-all duration-300 font-semibold"
           >
-            <Link to="/created" className="block">
-              Create Your Love Experience
-            </Link>
+            <Link to="/created">Create Your Love Experience</Link>
           </Button>
         </div>
       </motion.div>
